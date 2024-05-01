@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Builds
+dist/
+build/
+coverage/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
