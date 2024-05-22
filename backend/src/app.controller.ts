@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { Public } from './common/decorators/public.decorator';
 import { RedisService } from './redis/redis.service';
 
 @Controller()
@@ -9,6 +10,7 @@ export class AppController {
     private readonly redis: RedisService,
   ) {}
 
+  @Public()
   @Get('health')
   async health() {
     const [database, redis] = await Promise.all([

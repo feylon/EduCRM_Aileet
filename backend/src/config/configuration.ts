@@ -19,4 +19,14 @@ export default () => ({
     db: parseInt(process.env.REDIS_DB || '0', 10),
     keyPrefix: process.env.REDIS_KEY_PREFIX || 'educrm:',
   },
+  jwt: {
+    accessSecret: process.env.JWT_SECRET,
+    accessExpiresIn: process.env.JWT_EXPIRES_IN || '15m',
+    refreshSecret: process.env.JWT_REFRESH_SECRET,
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+  },
+  auth: {
+    maxLoginAttempts: parseInt(process.env.AUTH_MAX_LOGIN_ATTEMPTS || '5', 10),
+    lockoutSeconds: parseInt(process.env.AUTH_LOCKOUT_SECONDS || '900', 10),
+  },
 });
