@@ -42,6 +42,10 @@ export class UsersService {
     return `cache:user:${id}`;
   }
 
+  invalidateCache(id: string): Promise<void> {
+    return this.redis.del(UsersService.cacheKey(id));
+  }
+
   hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, BCRYPT_ROUNDS);
   }
@@ -138,7 +142,7 @@ export class UsersService {
     if (password) user.password = await this.hashPassword(password);
     const saved = await repo.save(user);
     delete (saved as Partial<User>).password;
-    await this.redis.del(UsersService.cacheKey(id));
+    await this.invalidateCache(id);
     return saved;
   }
 
@@ -169,7 +173,7 @@ export class UsersService {
     }
     const user = await this.findOne(id);
     await this.usersRepository.softRemove(user);
-    await this.redis.del(UsersService.cacheKey(id));
+    await this.invalidateCache(id);
   }
 
   updateProfile(id: string, dto: UpdateProfileDto): Promise<User> {
