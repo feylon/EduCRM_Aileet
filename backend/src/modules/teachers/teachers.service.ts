@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { Role } from '../../common/enums/role.enum';
 import { Paginated } from '../../common/interfaces/paginated.interface';
+import { pickDefined } from '../../common/utils/object.util';
 import { likePattern, paginate } from '../../common/utils/paginate';
 import { Course } from '../courses/entities/course.entity';
 import { User } from '../users/entities/user.entity';
@@ -100,7 +101,7 @@ export class TeachersService {
   async update(id: string, dto: UpdateTeacherDto): Promise<Teacher> {
     const teacher = await this.findOne(id);
     await this.dataSource.transaction(async (manager) => {
-      const userData = pick(dto, USER_FIELDS);
+      const userData = pickDefined(dto, USER_FIELDS);
       if (Object.keys(userData).length) await this.usersService.updateUser(teacher.userId, userData, manager);
 
       if (dto.specialization !== undefined) teacher.specialization = dto.specialization;
@@ -124,12 +125,4 @@ export class TeachersService {
     });
     await this.usersService.invalidateCache(teacher.userId);
   }
-}
-
-function pick<T extends object, K extends keyof T>(source: T, keys: readonly K[]): Partial<Pick<T, K>> {
-  const result: Partial<Pick<T, K>> = {};
-  for (const key of keys) {
-    if (source[key] !== undefined) result[key] = source[key];
-  }
-  return result;
 }
