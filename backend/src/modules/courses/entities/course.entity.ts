@@ -1,6 +1,7 @@
-import { Column, Entity, Index } from 'typeorm';
+import { Column, Entity, Index, OneToMany } from 'typeorm';
 import { SoftDeleteEntity } from '../../../common/entities/soft-delete.entity';
 import { numericTransformer } from '../../../common/utils/numeric.transformer';
+import { Group } from '../../groups/entities/group.entity';
 
 export enum CourseLevel {
   BEGINNER = 'beginner',
@@ -36,4 +37,7 @@ export class Course extends SoftDeleteEntity {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @OneToMany(() => Group, (group) => group.course)
+  groups: Group[];
 }

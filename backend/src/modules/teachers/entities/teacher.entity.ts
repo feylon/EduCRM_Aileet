@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, RelationId } from 'typeorm';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, RelationId } from 'typeorm';
 import { SoftDeleteEntity } from '../../../common/entities/soft-delete.entity';
 import { numericTransformer } from '../../../common/utils/numeric.transformer';
 import { Course } from '../../courses/entities/course.entity';
+import { Group } from '../../groups/entities/group.entity';
 import { User } from '../../users/entities/user.entity';
 
 @Entity('teachers')
@@ -40,4 +41,7 @@ export class Teacher extends SoftDeleteEntity {
 
   @RelationId((teacher: Teacher) => teacher.courses)
   courseIds: string[];
+
+  @OneToMany(() => Group, (group) => group.teacher)
+  groups: Group[];
 }

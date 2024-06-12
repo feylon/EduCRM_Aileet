@@ -27,7 +27,8 @@ export class TeachersService {
     return this.teachersRepository
       .createQueryBuilder('teacher')
       .innerJoinAndSelect('teacher.user', 'user')
-      .leftJoinAndSelect('teacher.courses', 'course');
+      .leftJoinAndSelect('teacher.courses', 'course')
+      .loadRelationCountAndMap('teacher.groupsCount', 'teacher.groups');
   }
 
   findAll(query: QueryTeachersDto): Promise<Paginated<Teacher>> {

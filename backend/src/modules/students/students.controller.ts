@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
+import { AuthUser } from '../../common/interfaces/auth-user.interface';
 import { UuidPipe } from '../../common/utils/parse-uuid.pipe';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { QueryStudentsDto } from './dto/query-students.dto';
@@ -15,10 +16,11 @@ import { StudentsService } from './students.service';
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
-  @Roles(Role.ADMIN)
+  /** Admins see all students, teachers — students of their own groups. */
+  @Roles(Role.ADMIN, Role.TEACHER)
   @Get()
-  findAll(@Query() query: QueryStudentsDto) {
-    return this.studentsService.findAll(query);
+  findAll(@Query() query: QueryStudentsDto, @CurrentUser() user: AuthUser) {
+    return this.studentsService.findAll(query, user);
   }
 
   @Roles(Role.STUDENT)
@@ -27,10 +29,10 @@ export class StudentsController {
     return this.studentsService.findByUserId(userId);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.TEACHER)
   @Get(':id')
-  findOne(@Param('id', UuidPipe) id: string) {
-    return this.studentsService.findOne(id);
+  findOne(@Param('id', UuidPipe) id: string, @CurrentUser() user: AuthUser) {
+    return this.studentsService.findOne(id, user);
   }
 
   @Roles(Role.ADMIN)

@@ -1,5 +1,6 @@
-import { Column, Entity, Index, JoinColumn, OneToOne } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { SoftDeleteEntity } from '../../../common/entities/soft-delete.entity';
+import { GroupStudent } from '../../groups/entities/group-student.entity';
 import { User } from '../../users/entities/user.entity';
 
 export enum StudentStatus {
@@ -47,4 +48,7 @@ export class Student extends SoftDeleteEntity {
 
   @Column({ type: 'text', nullable: true })
   notes: string | null;
+
+  @OneToMany(() => GroupStudent, (link) => link.student)
+  groupLinks: GroupStudent[];
 }

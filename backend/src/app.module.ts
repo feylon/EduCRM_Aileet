@@ -12,6 +12,7 @@ import { UsersModule } from './modules/users/users.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { TeachersModule } from './modules/teachers/teachers.module';
 import { StudentsModule } from './modules/students/students.module';
+import { GroupsModule } from './modules/groups/groups.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 
@@ -28,6 +29,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     CoursesModule,
     TeachersModule,
     StudentsModule,
+    GroupsModule,
   ],
   controllers: [AppController],
   providers: [

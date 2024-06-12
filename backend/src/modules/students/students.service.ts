@@ -2,9 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Role } from '../../common/enums/role.enum';
+import { AuthUser } from '../../common/interfaces/auth-user.interface';
 import { Paginated } from '../../common/interfaces/paginated.interface';
 import { pickDefined } from '../../common/utils/object.util';
 import { likePattern, paginate } from '../../common/utils/paginate';
+import { GroupAccessService } from '../groups/group-access.service';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -30,14 +32,41 @@ export class StudentsService {
     @InjectRepository(Student) private readonly studentsRepository: Repository<Student>,
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
+    private readonly groupAccess: GroupAccessService,
   ) {}
 
   private baseQuery() {
     return this.studentsRepository.createQueryBuilder('student').innerJoinAndSelect('student.user', 'user');
   }
 
-  findAll(query: QueryStudentsDto): Promise<Paginated<Student>> {
-    const qb = this.baseQuery();
+  /** Query with the student's active groups attached. */
+  private detailedQuery() {
+    return this.baseQuery()
+      .leftJoinAndSelect('student.groupLinks', 'link', "link.status = 'active'")
+      .leftJoinAndSelect('link.group', 'group')
+      .leftJoinAndSelect('group.course', 'course');
+  }
+
+  /** Restricts students to those who study in groups visible to the user (teachers: own groups). */
+  private applyScope(qb: ReturnType<StudentsService['baseQuery']>, user: AuthUser) {
+    const groupIdsSql = this.groupAccess.visibleGroupIdsSql(user);
+    if (groupIdsSql) {
+      qb.andWhere(
+        `student.id IN (SELECT sgs.student_id FROM group_students sgs WHERE sgs.status = 'active' AND sgs.group_id IN (${groupIdsSql}))`,
+        { scopeUserId: user.id },
+      );
+    }
+  }
+
+  findAll(query: QueryStudentsDto, user: AuthUser): Promise<Paginated<Student>> {
+    const qb = this.detailedQuery();
+    this.applyScope(qb, user);
+    if (query.groupId) {
+      qb.andWhere(
+        "student.id IN (SELECT fgs.student_id FROM group_students fgs WHERE fgs.group_id = :groupId AND fgs.status = 'active')",
+        { groupId: query.groupId },
+      );
+    }
     if (query.status) qb.andWhere('student.status = :status', { status: query.status });
     if (query.search) {
       qb.andWhere(
@@ -59,14 +88,16 @@ export class StudentsService {
     );
   }
 
-  async findOne(id: string): Promise<Student> {
-    const student = await this.baseQuery().where('student.id = :id', { id }).getOne();
+  async findOne(id: string, user?: AuthUser): Promise<Student> {
+    const qb = this.detailedQuery().where('student.id = :id', { id });
+    if (user) this.applyScope(qb, user);
+    const student = await qb.getOne();
     if (!student) throw new NotFoundException({ code: 'STUDENT_NOT_FOUND', message: 'Student not found' });
     return student;
   }
 
   async findByUserId(userId: string): Promise<Student> {
-    const student = await this.baseQuery().where('student.userId = :userId', { userId }).getOne();
+    const student = await this.detailedQuery().where('student.userId = :userId', { userId }).getOne();
     if (!student) throw new NotFoundException({ code: 'STUDENT_NOT_FOUND', message: 'Student profile not found' });
     return student;
   }

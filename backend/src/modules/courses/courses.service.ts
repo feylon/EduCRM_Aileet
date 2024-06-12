@@ -13,7 +13,9 @@ export class CoursesService {
   constructor(@InjectRepository(Course) private readonly coursesRepository: Repository<Course>) {}
 
   findAll(query: QueryCoursesDto): Promise<Paginated<Course>> {
-    const qb = this.coursesRepository.createQueryBuilder('course');
+    const qb = this.coursesRepository
+      .createQueryBuilder('course')
+      .loadRelationCountAndMap('course.groupsCount', 'course.groups');
     if (query.level) qb.andWhere('course.level = :level', { level: query.level });
     if (query.isActive !== undefined) qb.andWhere('course.isActive = :isActive', { isActive: query.isActive });
     if (query.search) {
@@ -36,7 +38,11 @@ export class CoursesService {
   }
 
   async findOne(id: string): Promise<Course> {
-    const course = await this.coursesRepository.findOne({ where: { id } });
+    const course = await this.coursesRepository
+      .createQueryBuilder('course')
+      .loadRelationCountAndMap('course.groupsCount', 'course.groups')
+      .where('course.id = :id', { id })
+      .getOne();
     if (!course) throw new NotFoundException({ code: 'COURSE_NOT_FOUND', message: 'Course not found' });
     return course;
   }
@@ -55,6 +61,12 @@ export class CoursesService {
 
   async remove(id: string): Promise<void> {
     const course = await this.findOne(id);
+    if ((course as Course & { groupsCount: number }).groupsCount > 0) {
+      throw new ConflictException({
+        code: 'COURSE_HAS_GROUPS',
+        message: 'Course has groups. Deactivate it instead of deleting.',
+      });
+    }
     await this.coursesRepository.softRemove(course);
   }
 
