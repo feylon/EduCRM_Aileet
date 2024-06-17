@@ -65,7 +65,12 @@ export class GroupsService {
 
   async findOne(id: string, user?: AuthUser): Promise<Group> {
     if (user) await this.access.assertAccess(id, user);
-    const group = await this.baseQuery().where('group.id = :id', { id }).getOne();
+    const group = await this.baseQuery()
+      .leftJoinAndSelect('group.schedules', 'schedule')
+      .where('group.id = :id', { id })
+      .orderBy('schedule.dayOfWeek', 'ASC')
+      .addOrderBy('schedule.startTime', 'ASC')
+      .getOne();
     if (!group) throw new NotFoundException({ code: 'GROUP_NOT_FOUND', message: 'Group not found' });
     return group;
   }

@@ -1,6 +1,7 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { SoftDeleteEntity } from '../../../common/entities/soft-delete.entity';
 import { Course } from '../../courses/entities/course.entity';
+import { Schedule } from '../../schedules/entities/schedule.entity';
 import { Teacher } from '../../teachers/entities/teacher.entity';
 import { GroupStudent } from './group-student.entity';
 
@@ -50,4 +51,7 @@ export class Group extends SoftDeleteEntity {
 
   @OneToMany(() => GroupStudent, (link) => link.group)
   groupStudents: GroupStudent[];
+
+  @OneToMany(() => Schedule, (schedule) => schedule.group)
+  schedules: Schedule[];
 }
