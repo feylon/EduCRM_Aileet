@@ -1,6 +1,7 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import configuration from './config/configuration';
 import { AppController } from './app.controller';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -14,6 +15,7 @@ import { TeachersModule } from './modules/teachers/teachers.module';
 import { StudentsModule } from './modules/students/students.module';
 import { GroupsModule } from './modules/groups/groups.module';
 import { SchedulesModule } from './modules/schedules/schedules.module';
+import { AttendanceModule } from './modules/attendance/attendance.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 
@@ -23,6 +25,7 @@ import { RolesGuard } from './common/guards/roles.guard';
       isGlobal: true,
       load: [configuration],
     }),
+    EventEmitterModule.forRoot(),
     DatabaseModule,
     RedisModule,
     UsersModule,
@@ -32,6 +35,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     StudentsModule,
     GroupsModule,
     SchedulesModule,
+    AttendanceModule,
   ],
   controllers: [AppController],
   providers: [
