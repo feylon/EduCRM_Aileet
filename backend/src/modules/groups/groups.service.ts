@@ -1,6 +1,8 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
+import { AppEvents } from '../../common/events/app-events';
 import { AuthUser } from '../../common/interfaces/auth-user.interface';
 import { Paginated } from '../../common/interfaces/paginated.interface';
 import { toDateString } from '../../common/utils/date.util';
@@ -25,6 +27,7 @@ export class GroupsService {
     @InjectRepository(Teacher) private readonly teachersRepository: Repository<Teacher>,
     @InjectRepository(Student) private readonly studentsRepository: Repository<Student>,
     private readonly access: GroupAccessService,
+    private readonly events: EventEmitter2,
   ) {}
 
   private baseQuery() {
@@ -91,6 +94,7 @@ export class GroupsService {
     await this.validateRelations(dto.courseId, dto.teacherId);
     this.validateDates(dto.startDate, dto.endDate);
     const group = await this.groupsRepository.save(this.groupsRepository.create(dto));
+    this.events.emit(AppEvents.GROUP_CHANGED);
     return this.findOne(group.id);
   }
 
@@ -102,12 +106,14 @@ export class GroupsService {
       ...dto,
       ...(dto.teacherId === null ? { teacherId: null } : {}),
     });
+    this.events.emit(AppEvents.GROUP_CHANGED);
     return this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {
     const group = await this.findOne(id);
     await this.groupsRepository.softRemove(group);
+    this.events.emit(AppEvents.GROUP_CHANGED);
   }
 
   async addStudents(id: string, dto: AddStudentsDto): Promise<GroupStudent[]> {
@@ -136,6 +142,7 @@ export class GroupsService {
       return Object.assign(link, { joinedAt, leftAt: null, status: GroupStudentStatus.ACTIVE });
     });
     await this.linksRepository.save(links);
+    this.events.emit(AppEvents.GROUP_CHANGED);
     return links;
   }
 
@@ -147,6 +154,7 @@ export class GroupsService {
     link.status = GroupStudentStatus.LEFT;
     link.leftAt = toDateString(new Date());
     await this.linksRepository.save(link);
+    this.events.emit(AppEvents.GROUP_CHANGED);
   }
 
   private async validateRelations(courseId?: string, teacherId?: string | null) {

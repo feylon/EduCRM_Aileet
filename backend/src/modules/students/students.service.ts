@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import { AppEvents } from '../../common/events/app-events';
 import { Role } from '../../common/enums/role.enum';
 import { AuthUser } from '../../common/interfaces/auth-user.interface';
 import { Paginated } from '../../common/interfaces/paginated.interface';
@@ -33,6 +35,7 @@ export class StudentsService {
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
     private readonly groupAccess: GroupAccessService,
+    private readonly events: EventEmitter2,
   ) {}
 
   private baseQuery() {
@@ -118,6 +121,7 @@ export class StudentsService {
       const student = manager.create(Student, { userId: user.id, ...pickDefined(dto, PROFILE_FIELDS) });
       return (await manager.save(student)).id;
     });
+    this.events.emit(AppEvents.STUDENT_CHANGED);
     return this.findOne(id);
   }
 
@@ -129,6 +133,7 @@ export class StudentsService {
       const profile = pickDefined(dto, PROFILE_FIELDS);
       if (Object.keys(profile).length) await manager.update(Student, student.id, profile);
     });
+    this.events.emit(AppEvents.STUDENT_CHANGED);
     return this.findOne(id);
   }
 
@@ -139,5 +144,6 @@ export class StudentsService {
       await manager.softDelete(User, student.userId);
     });
     await this.usersService.invalidateCache(student.userId);
+    this.events.emit(AppEvents.STUDENT_CHANGED);
   }
 }
