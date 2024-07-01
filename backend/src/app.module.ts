@@ -17,6 +17,7 @@ import { GroupsModule } from './modules/groups/groups.module';
 import { SchedulesModule } from './modules/schedules/schedules.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { LeadsModule } from './modules/leads/leads.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 
@@ -38,6 +39,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     SchedulesModule,
     AttendanceModule,
     PaymentsModule,
+    LeadsModule,
   ],
   controllers: [AppController],
   providers: [
