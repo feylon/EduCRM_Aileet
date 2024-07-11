@@ -20,6 +20,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { LeadsModule } from './modules/leads/leads.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { ReportsModule } from './modules/reports/reports.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 
@@ -44,6 +45,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     LeadsModule,
     NotificationsModule,
     DashboardModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [
