@@ -16,7 +16,9 @@
     "migration:create": "typeorm migration:create",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
-    "migration:run:prod": "typeorm -d dist/database/data-source.js migration:run"
+    "migration:run:prod": "typeorm -d dist/database/data-source.js migration:run",
+    "seed": "ts-node -r tsconfig-paths/register src/database/seeds/run-seed.ts",
+    "seed:prod": "node dist/database/seeds/run-seed.js"
   },
   "engines": {
     "node": ">=18"

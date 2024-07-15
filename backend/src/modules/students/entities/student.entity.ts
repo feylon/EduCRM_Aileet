@@ -22,7 +22,8 @@ export class Student extends SoftDeleteEntity {
   @JoinColumn()
   user: User;
 
-  @Column({ type: 'uuid', unique: true })
+  /** Unique: enforced by the one-to-one relation constraint. */
+  @Column({ type: 'uuid' })
   userId: string;
 
   @Column({ type: 'date', nullable: true })

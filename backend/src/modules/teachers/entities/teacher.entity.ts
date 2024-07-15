@@ -11,7 +11,8 @@ export class Teacher extends SoftDeleteEntity {
   @JoinColumn()
   user: User;
 
-  @Column({ type: 'uuid', unique: true })
+  /** Unique: enforced by the one-to-one relation constraint. */
+  @Column({ type: 'uuid' })
   userId: string;
 
   @Column({ type: 'varchar', length: 150, nullable: true })
