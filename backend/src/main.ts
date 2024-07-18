@@ -1,12 +1,20 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { validationExceptionFactory } from './common/utils/validation.factory';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const config = app.get(ConfigService);
+
+  // Behind nginx / a load balancer: trust X-Forwarded-For so rate limiting sees the real client IP
+  app.set('trust proxy', 1);
+  app.disable('x-powered-by');
+  app.use(helmet());
+  app.enableShutdownHooks();
 
   app.setGlobalPrefix(config.get<string>('app.apiPrefix', 'api'));
   app.enableCors({ origin: config.get<string[]>('app.corsOrigins'), credentials: true });

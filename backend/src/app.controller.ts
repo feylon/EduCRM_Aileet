@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { DataSource } from 'typeorm';
 import { Public } from './common/decorators/public.decorator';
 import { RedisService } from './redis/redis.service';
@@ -11,6 +12,7 @@ export class AppController {
   ) {}
 
   @Public()
+  @SkipThrottle()
   @Get('health')
   async health() {
     const [database, redis] = await Promise.all([

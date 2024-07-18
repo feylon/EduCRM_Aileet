@@ -1,12 +1,14 @@
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import configuration from './config/configuration';
 import { AppController } from './app.controller';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { DatabaseModule } from './database/database.module';
+import { RedisThrottlerStorage } from './redis/redis-throttler.storage';
 import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
@@ -33,6 +35,18 @@ import { RolesGuard } from './common/guards/roles.guard';
     EventEmitterModule.forRoot(),
     DatabaseModule,
     RedisModule,
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService, RedisThrottlerStorage],
+      useFactory: (config: ConfigService, storage: RedisThrottlerStorage) => ({
+        throttlers: [
+          {
+            ttl: config.get<number>('throttle.ttl', 60) * 1000,
+            limit: config.get<number>('throttle.limit', 120),
+          },
+        ],
+        storage,
+      }),
+    }),
     UsersModule,
     AuthModule,
     CoursesModule,
@@ -49,6 +63,7 @@ import { RolesGuard } from './common/guards/roles.guard';
   ],
   controllers: [AppController],
   providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
