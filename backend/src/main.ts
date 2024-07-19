@@ -5,6 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { validationExceptionFactory } from './common/utils/validation.factory';
+import { setupSwagger } from './config/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -16,7 +17,8 @@ async function bootstrap() {
   app.use(helmet());
   app.enableShutdownHooks();
 
-  app.setGlobalPrefix(config.get<string>('app.apiPrefix', 'api'));
+  const prefix = config.get<string>('app.apiPrefix', 'api');
+  app.setGlobalPrefix(prefix);
   app.enableCors({ origin: config.get<string[]>('app.corsOrigins'), credentials: true });
   app.useGlobalPipes(
     new ValidationPipe({
@@ -27,9 +29,11 @@ async function bootstrap() {
     }),
   );
 
+  if (config.get<boolean>('app.swaggerEnabled')) setupSwagger(app, prefix);
+
   const port = config.get<number>('app.port', 3000);
   await app.listen(port);
-  Logger.log(`API is running on port ${port}`, 'Bootstrap');
+  Logger.log(`API is running on port ${port} (docs: /${prefix}/docs)`, 'Bootstrap');
 }
 
 bootstrap();
