@@ -88,6 +88,16 @@ export default {
     INVALID_ASSIGNEE: 'Lidni faqat faol administratorga biriktirish mumkin',
     NO_RECIPIENTS: 'Kamida bitta rol yoki foydalanuvchini tanlang',
   },
+  confirm: {
+    deleteTitle: 'O‘chirishni tasdiqlang',
+    deleteMessage: 'Ushbu yozuv o‘chiriladi. Davom etasizmi?',
+    deleteNamed: '“{name}” o‘chiriladi. Davom etasizmi?',
+  },
+  empty: {
+    title: 'Ma’lumot topilmadi',
+    description: 'Hozircha bu yerda hech narsa yo‘q yoki filtr bo‘yicha natija topilmadi.',
+    errorTitle: 'Ma’lumotlarni yuklab bo‘lmadi',
+  },
   languages: {
     uz: 'O‘zbekcha',
     ru: 'Русский',

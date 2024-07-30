@@ -88,6 +88,16 @@ export default {
     INVALID_ASSIGNEE: 'A lead can only be assigned to an active administrator',
     NO_RECIPIENTS: 'Select at least one role or user',
   },
+  confirm: {
+    deleteTitle: 'Confirm deletion',
+    deleteMessage: 'This record will be deleted. Continue?',
+    deleteNamed: '“{name}” will be deleted. Continue?',
+  },
+  empty: {
+    title: 'Nothing found',
+    description: 'There is nothing here yet, or no results match your filters.',
+    errorTitle: 'Could not load data',
+  },
   languages: {
     uz: 'O‘zbekcha',
     ru: 'Русский',
