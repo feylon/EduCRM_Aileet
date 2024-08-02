@@ -27,6 +27,10 @@ export const i18n = createI18n({
   messages: { uz, ru, en },
 });
 
+export function hasStoredLocale(): boolean {
+  return !!localStorage.getItem(STORAGE_KEY);
+}
+
 export function currentLocale(): AppLocale {
   return i18n.global.locale.value as AppLocale;
 }

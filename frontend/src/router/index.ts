@@ -1,8 +1,71 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
+import { i18n } from '@/i18n';
+import { useAuthStore } from '@/stores/auth';
+import type { Role } from '@/types/models';
+
+declare module 'vue-router' {
+  interface RouteMeta {
+    /** Accessible without authentication (login page) */
+    guest?: boolean;
+    /** Allowed roles; empty = any authenticated user */
+    roles?: Role[];
+    /** i18n key of the page title */
+    title?: string;
+  }
+}
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/pages/auth/LoginPage.vue'),
+    meta: { guest: true, title: 'auth.signIn' },
+  },
+  {
+    path: '/',
+    name: 'home',
+    component: () => import('@/pages/HomePage.vue'),
+  },
+  {
+    path: '/forbidden',
+    name: 'forbidden',
+    component: () => import('@/pages/errors/ForbiddenPage.vue'),
+    meta: { title: 'errorPages.forbiddenTitle' },
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('@/pages/errors/NotFoundPage.vue'),
+    meta: { title: 'errorPages.notFoundTitle' },
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [{ path: '/', name: 'home', component: () => import('@/pages/HomePage.vue') }],
+  routes,
+  scrollBehavior: () => ({ top: 0 }),
+});
+
+router.beforeEach(async (to) => {
+  const auth = useAuthStore();
+  await auth.init();
+
+  if (to.meta.guest) {
+    return auth.isAuthenticated ? { name: 'home' } : true;
+  }
+  if (to.name === 'not-found') return true;
+  if (!auth.isAuthenticated) {
+    return { name: 'login', query: to.fullPath !== '/' ? { redirect: to.fullPath } : {} };
+  }
+  if (!auth.hasRole(to.meta.roles)) {
+    return { name: 'forbidden' };
+  }
+  return true;
+});
+
+router.afterEach((to) => {
+  const appName = i18n.global.t('app.name');
+  document.title = to.meta.title ? `${i18n.global.t(to.meta.title)} · ${appName}` : appName;
 });
 
 export default router;
