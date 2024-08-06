@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 import { i18n } from '@/i18n';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
 import { useAuthStore } from '@/stores/auth';
 import type { Role } from '@/types/models';
 
@@ -23,14 +24,33 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/',
-    name: 'home',
-    component: () => import('@/pages/HomePage.vue'),
-  },
-  {
-    path: '/forbidden',
-    name: 'forbidden',
-    component: () => import('@/pages/errors/ForbiddenPage.vue'),
-    meta: { title: 'errorPages.forbiddenTitle' },
+    component: DashboardLayout,
+    children: [
+      {
+        path: '',
+        name: 'dashboard',
+        component: () => import('@/pages/dashboard/DashboardPage.vue'),
+        meta: { title: 'nav.dashboard' },
+      },
+      {
+        path: 'notifications',
+        name: 'notifications',
+        component: () => import('@/pages/notifications/NotificationsPage.vue'),
+        meta: { title: 'notifications.title' },
+      },
+      {
+        path: 'profile',
+        name: 'profile',
+        component: () => import('@/pages/profile/ProfilePage.vue'),
+        meta: { title: 'nav.profile' },
+      },
+      {
+        path: 'forbidden',
+        name: 'forbidden',
+        component: () => import('@/pages/errors/ForbiddenPage.vue'),
+        meta: { title: 'errorPages.forbiddenTitle' },
+      },
+    ],
   },
   {
     path: '/:pathMatch(.*)*',
@@ -51,7 +71,7 @@ router.beforeEach(async (to) => {
   await auth.init();
 
   if (to.meta.guest) {
-    return auth.isAuthenticated ? { name: 'home' } : true;
+    return auth.isAuthenticated ? { name: 'dashboard' } : true;
   }
   if (to.name === 'not-found') return true;
   if (!auth.isAuthenticated) {
