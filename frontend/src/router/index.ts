@@ -45,6 +45,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.students', roles: ['admin', 'teacher'] },
       },
       {
+        path: 'teachers',
+        name: 'teachers',
+        component: () => import('@/pages/teachers/TeachersPage.vue'),
+        meta: { title: 'nav.teachers', roles: ['admin'] },
+      },
+      {
         path: 'notifications',
         name: 'notifications',
         component: () => import('@/pages/notifications/NotificationsPage.vue'),

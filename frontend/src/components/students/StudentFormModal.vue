@@ -6,7 +6,7 @@ import AppInput from '@/components/ui/AppInput.vue';
 import AppModal from '@/components/ui/AppModal.vue';
 import AppSelect from '@/components/ui/AppSelect.vue';
 import AppTextarea from '@/components/ui/AppTextarea.vue';
-import { useForm, useRules, type Rule } from '@/composables/useForm';
+import { useForm, useRules } from '@/composables/useForm';
 import { useToast } from '@/composables/useToast';
 import { studentsService, type StudentPayload } from '@/services/students.service';
 import type { Student } from '@/types/models';
@@ -36,16 +36,13 @@ const initial = {
   notes: '',
 };
 
-const passwordRules = (): Rule[] =>
-  isEdit.value ? [rules.minLength(6)] : [rules.required(), rules.minLength(6)];
-
 const { values, errors, submitting, submit, reset } = useForm(initial, {
   firstName: [rules.required(), rules.minLength(2)],
   lastName: [rules.required(), rules.minLength(2)],
   email: [rules.required(), rules.email()],
   phone: [rules.phone()],
   parentPhone: [rules.phone()],
-  password: [(value, all) => passwordRules().map((rule) => rule(value, all)).find((r) => r !== true) ?? true],
+  password: [rules.when(() => !isEdit.value, rules.required()), rules.minLength(6)],
 });
 
 watch(

@@ -27,6 +27,8 @@ export function useRules() {
       isEmpty(value) || Number(value) <= max ? true : t('validation.max', { max }),
     sameAs: (field: string): Rule => (value, values) =>
       value === values[field] ? true : t('validation.passwordMismatch'),
+    /** Applies `rule` only when `predicate()` is true (e.g. password required only on create). */
+    when: (predicate: () => boolean, rule: Rule): Rule => (value, values) => (predicate() ? rule(value, values) : true),
     after: (field: string, messageKey = 'validation.dateRange'): Rule => (value, values) =>
       isEmpty(value) || isEmpty(values[field]) || String(value) > String(values[field]) ? true : t(messageKey),
   };
