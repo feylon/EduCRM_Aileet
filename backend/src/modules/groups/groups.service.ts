@@ -42,7 +42,7 @@ export class GroupsService {
   }
 
   findAll(query: QueryGroupsDto, user: AuthUser): Promise<Paginated<Group>> {
-    const qb = this.baseQuery();
+    const qb = this.baseQuery().leftJoinAndSelect('group.schedules', 'schedule');
     this.access.applyScope(qb, 'group.id', user);
     if (query.courseId) qb.andWhere('group.courseId = :courseId', { courseId: query.courseId });
     if (query.teacherId) qb.andWhere('group.teacherId = :teacherId', { teacherId: query.teacherId });
