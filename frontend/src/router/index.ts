@@ -69,6 +69,24 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.groups' },
       },
       {
+        path: 'schedule',
+        name: 'schedule',
+        component: () => import('@/pages/schedule/SchedulePage.vue'),
+        meta: { title: 'nav.schedule' },
+      },
+      {
+        path: 'attendance',
+        name: 'attendance',
+        component: () => import('@/pages/attendance/AttendancePage.vue'),
+        meta: { title: 'nav.attendance', roles: ['admin', 'teacher'] },
+      },
+      {
+        path: 'my/attendance',
+        name: 'my-attendance',
+        component: () => import('@/pages/attendance/MyAttendancePage.vue'),
+        meta: { title: 'nav.myAttendance', roles: ['student'] },
+      },
+      {
         path: 'notifications',
         name: 'notifications',
         component: () => import('@/pages/notifications/NotificationsPage.vue'),
