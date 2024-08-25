@@ -210,6 +210,7 @@ export class DashboardService {
       this.groups
         .createQueryBuilder('g')
         .innerJoinAndSelect('g.course', 'course')
+        .leftJoinAndSelect('g.schedules', 'schedule')
         .loadRelationCountAndMap('g.studentsCount', 'g.groupStudents', 'link', (qb) =>
           qb.andWhere('link.status = :active', { active: GroupStudentStatus.ACTIVE }),
         )

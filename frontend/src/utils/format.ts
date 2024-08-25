@@ -8,6 +8,12 @@ const MONTHS: Record<string, string[]> = {
   en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
 };
 
+const MONTHS_SHORT: Record<string, string[]> = {
+  uz: ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyn', 'Iyl', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'],
+  ru: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+  en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+};
+
 const CURRENCY: Record<string, string> = { uz: 'so‘m', ru: 'сум', en: 'UZS' };
 
 /** 1 250 000 */
@@ -58,8 +64,9 @@ export function formatDateTime(value: string | Date | null | undefined): string 
 export function formatMonth(value: string | null | undefined, short = false): string {
   if (!value) return '—';
   const [year, month] = value.split('-').map(Number);
-  const name = (MONTHS[currentLocale()] || MONTHS.en)[month - 1] || '';
-  return short ? `${name.slice(0, 3)} ${String(year).slice(2)}` : `${name} ${year}`;
+  const names = short ? MONTHS_SHORT : MONTHS;
+  const name = (names[currentLocale()] || names.en)[month - 1] || '';
+  return short ? `${name} ${String(year).slice(2)}` : `${name} ${year}`;
 }
 
 /** "14:00:00" -> "14:00" */

@@ -29,14 +29,14 @@ const colors = {
 </script>
 
 <template>
-  <div class="card p-5">
+  <div class="card p-4 sm:p-5">
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
         <p class="truncate text-[13px] font-medium text-slate-500">{{ label }}</p>
         <AppSkeleton v-if="loading" class="mt-2.5 h-7 w-24" />
-        <p v-else class="mt-1.5 truncate text-2xl font-semibold tracking-tight text-slate-900">{{ value }}</p>
+        <p v-else class="mt-1.5 text-xl font-semibold tracking-tight text-slate-900 2xl:text-2xl">{{ value }}</p>
       </div>
-      <div v-if="icon" :class="['flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', colors[color]]">
+      <div v-if="icon" :class="['hidden h-10 w-10 shrink-0 sm:flex items-center justify-center rounded-xl', colors[color]]">
         <component :is="icon" class="h-5 w-5" />
       </div>
     </div>
