@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ArrowLeftIcon, EnvelopeIcon, PencilSquareIcon, PhoneIcon } from '@heroicons/vue/20/solid';
-import { computed, ref } from 'vue';
+import { ArrowLeftIcon, BanknotesIcon, EnvelopeIcon, PencilSquareIcon, PhoneIcon } from '@heroicons/vue/20/solid';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import AttendanceHistory from '@/components/attendance/AttendanceHistory.vue';
+import PaymentFormModal from '@/components/payments/PaymentFormModal.vue';
+import PaymentsTable from '@/components/payments/PaymentsTable.vue';
 import StudentFormModal from '@/components/students/StudentFormModal.vue';
 import AppAvatar from '@/components/ui/AppAvatar.vue';
 import AppBadge from '@/components/ui/AppBadge.vue';
@@ -12,10 +14,15 @@ import AppSkeleton from '@/components/ui/AppSkeleton.vue';
 import AppTabs from '@/components/ui/AppTabs.vue';
 import EmptyState from '@/components/ui/EmptyState.vue';
 import ErrorState from '@/components/ui/ErrorState.vue';
+import AppPagination from '@/components/ui/AppPagination.vue';
 import { useAsync } from '@/composables/useAsync';
+import { usePaymentActions } from '@/composables/usePaymentActions';
+import { useTable } from '@/composables/useTable';
+import { paymentsService } from '@/services/payments.service';
+import type { Payment } from '@/types/models';
 import { studentsService } from '@/services/students.service';
 import { useAuthStore } from '@/stores/auth';
-import { formatDate, fullName } from '@/utils/format';
+import { formatDate, formatMoney, fullName } from '@/utils/format';
 import { statusColor } from '@/utils/status';
 
 const route = useRoute();
@@ -26,10 +33,34 @@ const id = computed(() => route.params.id as string);
 const student = useAsync(() => studentsService.get(id.value));
 const tab = ref('overview');
 const editOpen = ref(false);
+const paymentOpen = ref(false);
+const editingPayment = ref<Payment | null>(null);
+
+const payments = useTable<Payment, { studentId: string }>(paymentsService.list, {
+  sortBy: 'paidAt',
+  filters: { studentId: id.value },
+  immediate: false,
+});
+const balance = useAsync(() => (auth.isStaff ? paymentsService.balance(id.value) : Promise.resolve(null)));
+watch(tab, (value) => {
+  if (value === 'payments' && !payments.meta.value) payments.load();
+});
+
+function refreshPayments() {
+  payments.load();
+  balance.run();
+}
+const paymentActions = usePaymentActions(refreshPayments);
+
+function openPayment(payment: Payment | null) {
+  editingPayment.value = payment;
+  paymentOpen.value = true;
+}
 
 const tabs = computed(() => [
   { value: 'overview', label: t('students.tabs.overview') },
   { value: 'attendance', label: t('students.tabs.attendance') },
+  ...(auth.isStaff ? [{ value: 'payments', label: t('students.tabs.payments') }] : []),
 ]);
 
 const info = computed(() => {
@@ -77,6 +108,7 @@ const info = computed(() => {
             </div>
           </div>
           <div v-if="auth.isStaff" class="flex gap-2">
+            <AppButton variant="soft" :icon="BanknotesIcon" @click="openPayment(null)">{{ $t('payments.accept') }}</AppButton>
             <AppButton variant="secondary" :icon="PencilSquareIcon" @click="editOpen = true">{{ $t('common.edit') }}</AppButton>
           </div>
         </div>
@@ -117,11 +149,53 @@ const info = computed(() => {
         </section>
       </div>
 
+      <div v-if="tab === 'payments'" class="mt-6 space-y-6">
+        <div v-if="balance.data.value?.groups.length" class="card overflow-hidden">
+          <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+            <h3 class="text-sm font-semibold text-slate-900">{{ $t('payments.balanceByGroup') }}</h3>
+            <span :class="['text-sm font-semibold', balance.data.value.totalDebt ? 'text-rose-600' : 'text-emerald-600']">
+              {{ balance.data.value.totalDebt ? `${$t('payments.totalDebt')}: ${formatMoney(balance.data.value.totalDebt)}` : $t('payments.noDebt') }}
+            </span>
+          </div>
+          <ul class="divide-y divide-slate-100">
+            <li v-for="group in balance.data.value.groups" :key="group.groupId" class="grid grid-cols-2 gap-2 px-5 py-3 text-sm sm:grid-cols-4">
+              <span class="font-medium text-slate-900">{{ group.groupName }} <span class="block text-xs font-normal text-slate-500">{{ $t('payments.months', { count: group.months }) }} × {{ formatMoney(group.monthlyPrice) }}</span></span>
+              <span class="text-slate-600">{{ $t('payments.charged') }}: <b class="text-slate-900">{{ formatMoney(group.charged) }}</b></span>
+              <span class="text-slate-600">{{ $t('payments.paid') }}: <b class="text-slate-900">{{ formatMoney(group.paid) }}</b></span>
+              <span :class="group.debt ? 'font-semibold text-rose-600' : 'text-emerald-600'">{{ group.debt ? formatMoney(group.debt) : $t('payments.noDebt') }}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="card overflow-hidden">
+          <PaymentsTable
+            :rows="payments.rows.value"
+            :loading="payments.loading.value"
+            :show-student="false"
+            :sort-by="payments.state.sortBy"
+            :sort-order="payments.state.sortOrder"
+            editable
+            @sort="payments.sort"
+            @edit="openPayment"
+            @refund="paymentActions.refund"
+            @remove="paymentActions.remove"
+          />
+          <AppPagination :meta="payments.meta.value" @page="payments.setPage" />
+        </div>
+      </div>
+
       <div v-if="tab === 'attendance'" class="card mt-6 overflow-hidden">
         <AttendanceHistory :student-id="id" />
       </div>
     </template>
 
+    <PaymentFormModal
+      v-if="auth.isStaff"
+      :open="paymentOpen"
+      :payment="editingPayment"
+      :preset-student-id="id"
+      @close="paymentOpen = false"
+      @saved="refreshPayments"
+    />
     <StudentFormModal :open="editOpen" :student="student.data.value" @close="editOpen = false" @saved="student.run()" />
   </div>
 </template>

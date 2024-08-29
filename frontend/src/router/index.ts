@@ -87,6 +87,18 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.myAttendance', roles: ['student'] },
       },
       {
+        path: 'payments',
+        name: 'payments',
+        component: () => import('@/pages/payments/PaymentsPage.vue'),
+        meta: { title: 'nav.payments', roles: ['admin'] },
+      },
+      {
+        path: 'my/payments',
+        name: 'my-payments',
+        component: () => import('@/pages/payments/MyPaymentsPage.vue'),
+        meta: { title: 'nav.myPayments', roles: ['student'] },
+      },
+      {
         path: 'notifications',
         name: 'notifications',
         component: () => import('@/pages/notifications/NotificationsPage.vue'),
