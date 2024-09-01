@@ -21,6 +21,11 @@ export class LeadsController {
     return this.leadsService.findAll(query);
   }
 
+  @Get('assignees')
+  assignees() {
+    return this.leadsService.assignees();
+  }
+
   @Get('stats')
   stats() {
     return this.leadsService.stats();

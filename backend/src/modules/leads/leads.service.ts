@@ -58,6 +58,15 @@ export class LeadsService {
     );
   }
 
+  /** Active administrators a lead can be assigned to. */
+  assignees(): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'role'>[]> {
+    return this.usersRepository.find({
+      where: { role: In(STAFF_ROLES), isActive: true },
+      select: { id: true, firstName: true, lastName: true, role: true },
+      order: { firstName: 'ASC' },
+    });
+  }
+
   /** Number of leads in each pipeline stage. */
   async stats() {
     const rows = await this.leadsRepository
