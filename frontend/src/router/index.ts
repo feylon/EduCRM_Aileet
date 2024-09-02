@@ -99,6 +99,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.myPayments', roles: ['student'] },
       },
       {
+        path: 'leads',
+        name: 'leads',
+        component: () => import('@/pages/leads/LeadsPage.vue'),
+        meta: { title: 'nav.leads', roles: ['admin'] },
+      },
+      {
         path: 'notifications',
         name: 'notifications',
         component: () => import('@/pages/notifications/NotificationsPage.vue'),

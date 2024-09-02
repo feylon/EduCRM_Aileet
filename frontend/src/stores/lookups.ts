@@ -48,10 +48,10 @@ export const useLookupsStore = defineStore('lookups', () => {
     return teachers.value;
   }
 
-  /** Staff users (for lead assignment). Uses the leads-accessible teachers-free endpoint. */
+  /** Active administrators that leads can be assigned to. */
   async function loadAdmins(force = false) {
     if (fresh('admins', force)) return admins.value;
-    admins.value = await fetchAll<User>('/leads/assignees', { sortBy: undefined, sortOrder: undefined });
+    admins.value = (await http.get<{ data: User[] }>('/leads/assignees')).data.data;
     loadedAt.admins = Date.now();
     return admins.value;
   }
