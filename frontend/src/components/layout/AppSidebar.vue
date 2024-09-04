@@ -16,7 +16,7 @@ const sections = computed(() =>
   navigation
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) => auth.hasRole(item.roles) && router.hasRoute(item.name)),
+      items: section.items.filter((item) => auth.hasRole(item.roles, item.exact) && router.hasRoute(item.name)),
     }))
     .filter((section) => section.items.length),
 );

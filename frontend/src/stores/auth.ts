@@ -19,10 +19,10 @@ export const useAuthStore = defineStore('auth', () => {
   const isStudent = computed(() => role.value === 'student');
 
   /** Mirrors the backend RolesGuard: super admin can do everything. */
-  function hasRole(roles?: Role[]): boolean {
+  function hasRole(roles?: Role[], exact = false): boolean {
     if (!roles || !roles.length) return true;
     if (!role.value) return false;
-    return role.value === 'super_admin' || roles.includes(role.value);
+    return roles.includes(role.value) || (!exact && role.value === 'super_admin');
   }
 
   async function login(email: string, password: string) {

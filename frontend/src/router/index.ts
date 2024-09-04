@@ -10,6 +10,8 @@ declare module 'vue-router' {
     guest?: boolean;
     /** Allowed roles; empty = any authenticated user */
     roles?: Role[];
+    /** Do not let super admins in automatically (self-service pages) */
+    exactRoles?: boolean;
     /** i18n key of the page title */
     title?: string;
   }
@@ -84,7 +86,7 @@ const routes: RouteRecordRaw[] = [
         path: 'my/attendance',
         name: 'my-attendance',
         component: () => import('@/pages/attendance/MyAttendancePage.vue'),
-        meta: { title: 'nav.myAttendance', roles: ['student'] },
+        meta: { title: 'nav.myAttendance', roles: ['student'], exactRoles: true },
       },
       {
         path: 'payments',
@@ -96,13 +98,25 @@ const routes: RouteRecordRaw[] = [
         path: 'my/payments',
         name: 'my-payments',
         component: () => import('@/pages/payments/MyPaymentsPage.vue'),
-        meta: { title: 'nav.myPayments', roles: ['student'] },
+        meta: { title: 'nav.myPayments', roles: ['student'], exactRoles: true },
       },
       {
         path: 'leads',
         name: 'leads',
         component: () => import('@/pages/leads/LeadsPage.vue'),
         meta: { title: 'nav.leads', roles: ['admin'] },
+      },
+      {
+        path: 'reports',
+        name: 'reports',
+        component: () => import('@/pages/reports/ReportsPage.vue'),
+        meta: { title: 'nav.reports', roles: ['admin'] },
+      },
+      {
+        path: 'users',
+        name: 'users',
+        component: () => import('@/pages/users/UsersPage.vue'),
+        meta: { title: 'nav.users', roles: ['super_admin'] },
       },
       {
         path: 'notifications',
@@ -149,7 +163,7 @@ router.beforeEach(async (to) => {
   if (!auth.isAuthenticated) {
     return { name: 'login', query: to.fullPath !== '/' ? { redirect: to.fullPath } : {} };
   }
-  if (!auth.hasRole(to.meta.roles)) {
+  if (!auth.hasRole(to.meta.roles, to.meta.exactRoles)) {
     return { name: 'forbidden' };
   }
   return true;

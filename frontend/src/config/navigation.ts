@@ -21,6 +21,8 @@ export interface NavItem {
   label: string;
   icon: Component;
   roles?: Role[];
+  /** Only these exact roles (self-service pages are not shown to super admins). */
+  exact?: boolean;
 }
 
 export interface NavSection {
@@ -45,14 +47,14 @@ export const navigation: NavSection[] = [
       { name: 'groups', label: 'nav.groups', icon: UserGroupIcon },
       { name: 'schedule', label: 'nav.schedule', icon: CalendarDaysIcon },
       { name: 'attendance', label: 'nav.attendance', icon: ClipboardDocumentCheckIcon, roles: [...STAFF, 'teacher'] },
-      { name: 'my-attendance', label: 'nav.myAttendance', icon: ClipboardDocumentCheckIcon, roles: ['student'] },
+      { name: 'my-attendance', label: 'nav.myAttendance', icon: ClipboardDocumentCheckIcon, roles: ['student'], exact: true },
     ],
   },
   {
     title: 'nav.sections.business',
     items: [
       { name: 'payments', label: 'nav.payments', icon: BanknotesIcon, roles: STAFF },
-      { name: 'my-payments', label: 'nav.myPayments', icon: BanknotesIcon, roles: ['student'] },
+      { name: 'my-payments', label: 'nav.myPayments', icon: BanknotesIcon, roles: ['student'], exact: true },
       { name: 'leads', label: 'nav.leads', icon: FunnelIcon, roles: STAFF },
       { name: 'reports', label: 'nav.reports', icon: PresentationChartBarIcon, roles: STAFF },
     ],
