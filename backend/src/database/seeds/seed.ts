@@ -311,7 +311,9 @@ export async function runSeed(dataSource: DataSource): Promise<void> {
       const createdAt = addDays(today, -random.int(0, 170));
       leads.push(
         manager.create(Lead, {
-          fullName: `${random.pick(female ? FIRST_NAMES_FEMALE : FIRST_NAMES_MALE)} ${random.pick(LAST_NAMES)}`,
+          fullName: `${random.pick(female ? FIRST_NAMES_FEMALE : FIRST_NAMES_MALE)} ${
+            female ? feminineLastName(random.pick(LAST_NAMES)) : random.pick(LAST_NAMES)
+          }`,
           phone: `+99899${String(5000000 + index * 6151).padStart(7, '0')}`,
           source: random.pick(Object.values(LeadSource)),
           status,
