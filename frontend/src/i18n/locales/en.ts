@@ -17,6 +17,7 @@ export default {
     yes: 'Yes',
     no: 'No',
     back: 'Back',
+    next: 'Next',
     close: 'Close',
     filter: 'Filter',
     reset: 'Reset',
@@ -43,6 +44,7 @@ export default {
     saving: 'Saving...',
   },
   validation: {
+    invalidValue: 'Invalid value',
     required: 'This field is required',
     email: 'Enter a valid email address',
     minLength: 'Must be at least {min} characters',

@@ -143,7 +143,7 @@ async function save() {
           <div class="flex items-center gap-1">
             <AppButton variant="secondary" size="md" :aria-label="$t('common.back')" @click="shiftDate(-1)"><ChevronLeftIcon class="h-4 w-4" /></AppButton>
             <input v-model="date" type="date" class="form-control w-44" :max="todayString()" />
-            <AppButton variant="secondary" size="md" :disabled="date >= todayString()" aria-label="Next" @click="shiftDate(1)"><ChevronRightIcon class="h-4 w-4" /></AppButton>
+            <AppButton variant="secondary" size="md" :disabled="date >= todayString()" :aria-label="$t('common.next')" @click="shiftDate(1)"><ChevronRightIcon class="h-4 w-4" /></AppButton>
             <AppButton variant="ghost" size="md" @click="date = todayString()">{{ $t('common.today') }}</AppButton>
           </div>
         </div>

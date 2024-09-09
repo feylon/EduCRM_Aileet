@@ -46,6 +46,7 @@ export function useForm<T extends Record<string, any>>(
   const errors = reactive<Record<string, string>>({});
   const submitting = ref(false);
   const toast = useToast();
+  const { t } = useI18n();
 
   function clearErrors() {
     Object.keys(errors).forEach((key) => delete errors[key]);
@@ -80,7 +81,8 @@ export function useForm<T extends Record<string, any>>(
       await action(values);
       return true;
     } catch (error) {
-      Object.assign(errors, getFieldErrors(error));
+      // API messages are English; show a translated hint next to each rejected field.
+      Object.keys(getFieldErrors(error)).forEach((field) => (errors[field] = t('validation.invalidValue')));
       if (getErrorCode(error) !== 'VALIDATION_ERROR' || !Object.keys(errors).length) {
         toast.error(getErrorMessage(error));
       }

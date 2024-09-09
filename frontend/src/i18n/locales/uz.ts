@@ -17,6 +17,7 @@ export default {
     yes: 'Ha',
     no: 'Yo‘q',
     back: 'Orqaga',
+    next: 'Keyingi',
     close: 'Yopish',
     filter: 'Filtr',
     reset: 'Tozalash',
@@ -43,6 +44,7 @@ export default {
     saving: 'Saqlanmoqda...',
   },
   validation: {
+    invalidValue: 'Qiymat noto‘g‘ri',
     required: 'Ushbu maydon to‘ldirilishi shart',
     email: 'To‘g‘ri email manzil kiriting',
     minLength: 'Kamida {min} ta belgi bo‘lishi kerak',

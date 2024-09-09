@@ -67,7 +67,7 @@ const pages = computed<(number | '…')[]>(() => {
       <button
         class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 disabled:opacity-40"
         :disabled="meta.page >= meta.totalPages"
-        aria-label="Next"
+        :aria-label="$t('common.next')"
         @click="emit('page', meta.page + 1)"
       >
         <ChevronRightIcon class="h-4 w-4" />

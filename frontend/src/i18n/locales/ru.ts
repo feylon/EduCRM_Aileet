@@ -17,6 +17,7 @@ export default {
     yes: 'Да',
     no: 'Нет',
     back: 'Назад',
+    next: 'Далее',
     close: 'Закрыть',
     filter: 'Фильтр',
     reset: 'Сбросить',
@@ -43,6 +44,7 @@ export default {
     saving: 'Сохранение...',
   },
   validation: {
+    invalidValue: 'Некорректное значение',
     required: 'Это поле обязательно',
     email: 'Введите корректный email',
     minLength: 'Минимум {min} символов',
