@@ -2,6 +2,8 @@
 
 O‘quv markazlarini boshqarish uchun to‘liq ishlaydigan CRM: o‘quvchilar, o‘qituvchilar, kurslar, guruhlar, dars jadvali, davomat, to‘lovlar va qarzdorlik, lidlar (savdo voronkasi), hisobotlar va real vaqt statistikasi bilan dashboard.
 
+> **Holat:** ✅ v1.0.0 — loyiha yakunlangan. Backend, frontend, Docker, migration, seed, Swagger, RBAC, i18n va testlar tayyor (qarang: [CHANGELOG.md](CHANGELOG.md)).
+
 Interfeys **3 tilda** ishlaydi (O‘zbek — standart, Русский, English), desktop, planshet va telefonga moslashgan.
 
 ---
